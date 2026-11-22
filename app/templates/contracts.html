@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% from "ledger.jinja" import register %}
+{% from "coverage.jinja" import coverage %}
 {% block stage %}
 <div class="register-grid">
   {% for key in keys %}{{ register(key, run[key], ('档段',)) }}{% endfor %}
+  {{ coverage(run['合同覆盖'], run['覆盖汇总']) }}
 </div>
 {% endblock %}

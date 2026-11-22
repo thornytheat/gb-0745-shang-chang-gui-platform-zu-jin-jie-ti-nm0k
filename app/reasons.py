@@ -10,6 +10,8 @@ REASONS = {
     "REFUND_LIMIT": "累计退款超过原款",
     "REFUND_SHOP": "退单柜台与原单不同",
     "AFTER_CUT": "晚于结账截止日",
+    "PROVISIONAL_AMBIGUOUS": "上一版合同不唯一，无法暂估",
+    "PROVISIONAL_EXPIRED": "空档超过暂估期限",
 }
 
 

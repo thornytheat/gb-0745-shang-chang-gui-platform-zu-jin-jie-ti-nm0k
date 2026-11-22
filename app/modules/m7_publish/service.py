@@ -3,6 +3,7 @@ from time import perf_counter
 from app.manifest import input_identity, manifest
 from app.modules.m1_intake.reader import open_payload
 from app.modules.m1_intake.service import parse_events
+from app.modules.m2_contracts.coverage import coverage_segments, coverage_state, shop_coverage
 from app.modules.m2_contracts.service import bind_sales, version_conflicts
 from app.modules.m2_contracts.versions import normalize_contracts
 from app.modules.m3_calendar.month import month_window
@@ -13,6 +14,17 @@ from app.modules.m5_refunds.service import previous_period_credits
 from app.modules.m6_reconcile.service import parse_statement, reconcile, row_balance
 from app.modules.m6_reconcile.totals import summary
 from app.reasons import issue
+
+
+def _active_shops(events, sales, period):
+    """本月确有交易的柜台，含因暂估失败被隔离的销售方，保证覆盖表不缺柜台。"""
+    active = {item["shop"] for item in sales.values()}
+    active |= {
+        event["shop"]
+        for event in events
+        if event["kind"] == "sale" and event["day"].isoformat()[:7] == period
+    }
+    return active
 
 
 def calculate(raw, period):
@@ -29,10 +41,14 @@ def calculate(raw, period):
     sales, invalid_sales = bind_sales(contracts, in_cut)
     refunds, invalid_refunds = match_refunds(in_cut, sales)
     isolated = sorted(isolated + invalid_sales + invalid_refunds, key=lambda item: item["行号"])
-    current, exceptions = calculate_period(sales, deduction_map(refunds, end), contracts, exempt, period)
+    current, exceptions = calculate_period(
+        sales, deduction_map(refunds, end), contracts, exempt, period
+    )
     credits = previous_period_credits(sales, refunds, contracts, exempt, start, end)
     rows = reconcile(current, credits, statement)
     balance = row_balance(len(raw_data["events"]), sales, refunds, isolated, duplicates, after_cut)
+    segments = coverage_segments(contracts, period, _active_shops(in_cut, sales, period))
+    summaries = shop_coverage(segments)
     return {
         "运行清单": manifest(run_id, parameters, round((perf_counter() - started) * 1000)),
         "行数勾稽": balance,
@@ -40,6 +56,10 @@ def calculate(raw, period):
         "柜台对账": rows,
         "分段核算": current,
         "旧期回冲": credits,
+        "合同覆盖": segments,
+        "覆盖汇总": summaries,
+        "覆盖索引": {row["柜台"]: row for row in summaries},
+        "覆盖状态": coverage_state(segments),
         "收银行": [
             {
                 "行号": e["line"],
@@ -48,6 +68,7 @@ def calculate(raw, period):
                 "销售日": e["day"].isoformat(),
                 "销售分": e["cents"],
                 "版本": e["version"],
+                "依据": e["basis"],
             }
             for e in sales.values()
         ],

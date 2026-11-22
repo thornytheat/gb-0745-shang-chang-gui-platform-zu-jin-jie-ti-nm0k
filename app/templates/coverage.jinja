@@ -1,0 +1,32 @@
+{% macro coverage(segments, summaries) %}
+<section class="panel coverage-panel">
+  <div class="panel-head"><h2>合同覆盖 · 正式 / 暂估</h2><span>逐柜台逐日</span></div>
+  <div class="table-scroll" tabindex="0" aria-label="合同覆盖">
+    <table>
+      <thead><tr><th scope="col">柜台</th><th scope="col">区段</th><th scope="col">天数</th><th scope="col">状态</th><th scope="col">依据版本</th><th scope="col">说明</th></tr></thead>
+      <tbody>
+      {% for row in segments %}
+        <tr>
+          <td>{{ row['柜台'] }}</td>
+          <td class="num">{{ row['起始'] }} → {{ row['截止'] }}</td>
+          <td class="num">{{ row['天数'] }}</td>
+          <td><span class="state" data-state="{{ row['状态'] }}">{{ row['状态'] }}</span></td>
+          <td>{{ row['依据版本'] or '—' }}</td>
+          <td>{{ row['说明'] or ('候选 ' ~ row['候选版本']|join('、') if row['候选版本']|length > 1 else '') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if summaries %}
+  <dl class="coverage-summary">
+    {% for row in summaries %}
+    <div>
+      <dt>{{ row['柜台'] }}</dt>
+      <dd><span class="state" data-state="正式">{{ row['正式日'] }} 正式日</span> <span class="state" data-state="暂估">{{ row['暂估日'] }} 暂估日</span>{% if row['挂起日'] %} <span class="state" data-state="挂起">{{ row['挂起日'] }} 挂起日</span>{% endif %}{% if row['冲突日'] %} <span class="state" data-state="冲突">{{ row['冲突日'] }} 冲突日</span>{% endif %}{% if row['暂估依据'] %} <small>暂估依据 {{ row['暂估依据']|join('、') }}</small>{% endif %}</dd>
+    </div>
+    {% endfor %}
+  </dl>
+  {% endif %}
+</section>
+{% endmacro %}

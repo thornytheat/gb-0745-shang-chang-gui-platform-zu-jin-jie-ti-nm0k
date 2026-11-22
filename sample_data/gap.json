@@ -1,0 +1,116 @@
+{
+  "contracts": [
+    {
+      "shop": "001",
+      "version": "N-A",
+      "start": "2026-09-01",
+      "end": "2026-11-01",
+      "minimum": "0",
+      "tiers": [
+        ["1000", 1000],
+        [null, 2000]
+      ]
+    },
+    {
+      "shop": "001",
+      "version": "N-B",
+      "start": "2026-11-06",
+      "end": "2027-01-01",
+      "minimum": "0",
+      "tiers": [
+        ["1000", 1000],
+        [null, 2000]
+      ]
+    },
+    {
+      "shop": "002",
+      "version": "N-A",
+      "start": "2026-10-01",
+      "end": "2026-11-01",
+      "minimum": "300",
+      "tiers": [
+        ["1000", 1000],
+        [null, 2000]
+      ]
+    },
+    {
+      "shop": "004",
+      "version": "N-A",
+      "start": "2026-08-01",
+      "end": "2026-09-16",
+      "minimum": "300",
+      "tiers": [
+        [null, 500]
+      ]
+    },
+    {
+      "shop": "005",
+      "version": "N-P",
+      "start": "2026-09-01",
+      "end": "2026-10-15",
+      "minimum": "300",
+      "tiers": [
+        [null, 500]
+      ]
+    },
+    {
+      "shop": "005",
+      "version": "N-Q",
+      "start": "2026-09-15",
+      "end": "2026-10-15",
+      "minimum": "300",
+      "tiers": [
+        [null, 500]
+      ]
+    }
+  ],
+  "holidays": [],
+  "events": [
+    {
+      "id": "G001",
+      "shop": "001",
+      "day": "2026-11-03",
+      "amount": "1500",
+      "kind": "sale"
+    },
+    {
+      "id": "G002",
+      "shop": "001",
+      "day": "2026-11-10",
+      "amount": "800",
+      "kind": "sale"
+    },
+    {
+      "id": "G003",
+      "shop": "002",
+      "day": "2026-11-15",
+      "amount": "200",
+      "kind": "sale"
+    },
+    {
+      "id": "G004",
+      "shop": "003",
+      "day": "2026-11-10",
+      "amount": "300",
+      "kind": "sale"
+    },
+    {
+      "id": "G005",
+      "shop": "004",
+      "day": "2026-11-10",
+      "amount": "300",
+      "kind": "sale"
+    },
+    {
+      "id": "G006",
+      "shop": "005",
+      "day": "2026-11-10",
+      "amount": "300",
+      "kind": "sale"
+    }
+  ],
+  "statement": [
+    { "shop": "001", "paid": "280" },
+    { "shop": "002", "paid": "0" }
+  ]
+}

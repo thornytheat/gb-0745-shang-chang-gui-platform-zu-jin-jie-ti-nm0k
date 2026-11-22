@@ -15,8 +15,12 @@ def previous_period_credits(sales, refunds, contracts, exempt, start, end):
     for period, _, _ in touched:
         if period in before_by_period:
             continue
-        before_by_period[period] = bill_map(calculate_period(sales, before, contracts, exempt, period)[0])
-        after_by_period[period] = bill_map(calculate_period(sales, after, contracts, exempt, period)[0])
+        before_by_period[period] = bill_map(
+            calculate_period(sales, before, contracts, exempt, period)[0]
+        )
+        after_by_period[period] = bill_map(
+            calculate_period(sales, after, contracts, exempt, period)[0]
+        )
     return [
         {
             "原账期": period,

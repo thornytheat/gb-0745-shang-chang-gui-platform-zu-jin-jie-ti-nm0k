@@ -9,7 +9,7 @@
 | 模块 | 使用者动作 | 入口 | 核心文件 | 测试 |
 |---|---|---|---|---|
 | M1 收银采信 | 上传账簿，隔离坏金额和同号矛盾 | `GET /api/intake/{id}` | `app/modules/m1_intake/service.py` `app/modules/m1_intake/amounts.py` | `tests/test_intake.py` |
-| M2 合同版本 | 查销售日的合同与重叠区间 | `GET /api/contracts/{id}` | `app/modules/m2_contracts/versions.py` `app/modules/m2_contracts/service.py` | `tests/test_contracts.py` |
+| M2 合同版本 | 查销售日的合同、重叠区间与暂估/正式覆盖 | `GET /api/contracts/{id}` | `app/modules/m2_contracts/versions.py` `app/modules/m2_contracts/coverage.py` `app/modules/m2_contracts/service.py` | `tests/test_contracts.py` `tests/test_provisional.py` |
 | M3 免租日历 | 查看合同日历、免租日期和保底折算 | `GET /api/calendar/{id}` | `app/modules/m3_calendar/month.py` `app/modules/m3_calendar/service.py` | `tests/test_calendar.py` |
 | M4 累进抽成 | 对照档位费用与版本保底 | `GET /api/tiers/{id}` | `app/modules/m4_tiers/progressive.py` `app/modules/m4_tiers/service.py` | `tests/test_tiers.py` |
 | M5 退单回冲 | 追原流水，重算旧月应计差 | `GET /api/refunds/{id}` | `app/modules/m5_refunds/credits.py` `app/modules/m5_refunds/service.py` | `tests/test_refunds.py` |
@@ -31,6 +31,12 @@
 | TRAP-17 | `mall.json` 旧金额字段 gross | 旧账对应列丢失 | 显式兼容别名 | `app/modules/m1_intake/service.py` | `tests/test_intake.py::test_legacy_alias` |
 | TRAP-23 | `mall.json` 合同于当日切换 | 同时计入两个版本 | 合同 `[start,end)` | `app/modules/m2_contracts/versions.py` | `tests/test_contracts.py::test_adjacent_boundaries` |
 | TRAP-25 | `mall.json` 存在合同重叠 | 随机采信一版 | 暂停区间内归属并提供冲突区间 | `app/modules/m2_contracts/service.py` | `tests/test_contracts.py::test_overlap_not_guessed` |
+| TRAP-31 | `gap.json` 合同到期后仍营业 | 空档期销售当缺合同丢弃、本期收款断档 | 顺延上一版条款暂估，正式/暂估合并到同一柜台金额 | `app/modules/m2_contracts/coverage.py` | `tests/test_provisional.py::test_mid_month_signing_splits_provisional_and_formal` |
+| TRAP-32 | `gap.json` 补签只从中段生效 | 前段凭空空转或重复计一份暂估 | 逐日拆分正式/暂估区间，同一柜台只出一个应缴数 | `app/modules/m2_contracts/coverage.py` `app/modules/m4_tiers/service.py` | `tests/test_provisional.py::test_each_shop_has_single_outward_amount` |
+| TRAP-33 | `gap.json` 空档超期或上一版不唯一 | 无限顺延或随机挑一版 | 判为暂估失败并挂起，保留候选依据 | `app/modules/m2_contracts/coverage.py` | `tests/test_provisional.py::test_expired_gap_holds_and_keeps_basis` `tests/test_provisional.py::test_ambiguous_predecessor_holds` |
+| TRAP-34 | 补签后重跑旧暂估 | 旧版仍对外、两版金额并存 | 新批次减少暂估后旧批标 `已失效`，载荷与依据保留 | `app/modules/m7_publish/supersede.py` | `tests/test_provisional.py::test_supersession_marks_old_provisional_invalid` |
+| TRAP-35 | 补签重跑同一份资料 | 重复计同一笔销售 | 摘要/账期/规则决定同一批次，不再新增 | `app/store.py` `app/manifest.py` | `tests/test_provisional.py::test_rerunning_same_input_does_not_double_count` |
+| TRAP-36 | 暂估失败的新批次 | 坏批次覆盖还能收款的暂估版 | 旧版保持 `有效`，失败批次标 `未采用` | `app/modules/m7_publish/supersede.py` | `tests/test_provisional.py::test_failed_rerun_keeps_old_provisional` |
 
 ## 验算
 

@@ -21,7 +21,7 @@
   </aside>
   <div class="work">
     <header class="topbar">
-      <div><span>{{ meta['账期'] }}</span><h1>{{ title }}</h1></div>
+      <div><span>{{ meta['账期'] }}</span><h1>{{ title }}</h1>{% if run['版本状态'] %}<span class="batch-state" data-state="{{ run['版本状态']['状态'] }}">{{ run['版本状态']['状态'] }}{% if run['版本状态']['替代批次'] %} · 被 {{ run['版本状态']['替代批次'] }} 替代{% endif %}</span>{% endif %}</div>
       <a data-export href="{{ url_for('export', run_id=meta['批次']) }}">下载结算凭证</a>
     </header>
     <main class="content">

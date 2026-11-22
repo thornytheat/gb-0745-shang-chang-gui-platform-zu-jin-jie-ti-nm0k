@@ -98,6 +98,8 @@ def create_app(config=None):
             location=url_for("work", stage=stage, run=key, sample=sample, reuse="1" if reused else None),
             balance=run["行数勾稽"],
             totals=run["金额勾稽"],
+            coverage=run["覆盖状态"],
+            status=run["版本状态"]["状态"],
         ), 200 if reused else 201
 
     @app.get("/api/export/<run_id>")

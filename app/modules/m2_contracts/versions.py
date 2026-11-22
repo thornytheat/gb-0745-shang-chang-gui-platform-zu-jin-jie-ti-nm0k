@@ -43,3 +43,16 @@ def version_on(contracts, shop, day):
     if len(matched) != 1:
         return None, "OVERLAP" if matched else "NO_CONTRACT"
     return matched[0], None
+
+
+def predecessor_candidates(contracts, shop, day):
+    """空档期顺延暂估的候选：已经结束且结束日不晚于当日、结束日最晚的合同。
+
+    正常情况下只有一版；若历史合同交叠导致多版同日结束，则候选不唯一，
+    调用方不得擅自选一版，应把该日判为暂估失败。
+    """
+    ended = [c for c in contracts if c["shop"] == shop and c["end"] <= day]
+    if not ended:
+        return []
+    latest_end = max(c["end"] for c in ended)
+    return [c for c in ended if c["end"] == latest_end]
